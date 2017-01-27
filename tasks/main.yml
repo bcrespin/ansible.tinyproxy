@@ -1,0 +1,25 @@
+---
+# tasks file for ansible.tinyproxy
+- name: Gathering OS specific variables
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+      - "{{ ansible_distribution }}.{{ ansible_distribution_release }}.yml"
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+      skip: 'true'
+  tags: ['tinyproxy']
+
+- include: install.yml
+  tags: ['tinyproxy']
+
+- name: config file
+  template: src=tinyproxy.conf.j2 dest={{ tinyproxy_dir }}/{{ tinyproxy_configfile }} 
+  notify: reload service
+  tags: ['tinyproxy']
+  register: res
+ 
+- name: manage service
+  service: name={{ tinyproxy_service_name }} state=started enabled=yes
+  tags: ['tinyproxy']
+  when: not res.changed

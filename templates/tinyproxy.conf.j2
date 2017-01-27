@@ -1,0 +1,43 @@
+# this file is managed by ansible
+# do not edit directly
+
+user {{ tinyproxy_user }}
+group {{ tinyproxy_group }}
+
+port {{ tinyproxy_port }}
+
+Listen {{ tinyproxy_listen }}
+{% if tinyproxy_bind_same %}
+BindSame yes
+{% else %}
+Bind {{ tinyproxy_bind }}
+{% endif %}
+Timeout {{ tinyproxy_timeout }}
+DefaultErrorFile "{{ tinyproxy_defaulterrorfile }}"
+StatFile "{{ tinyproxy_statfile }}"
+{% if tinyproxy_syslog %}
+Syslog On
+{% else %}
+LogLevel {{ tinyproxy_loglevel  }}
+{% endif %}
+
+MaxClients {{ tinyproxy_max_clients }}
+MinSpareServers {{ tinyproxy_min_spareservers }}
+MaxSpareServers {{ tinyproxy_max_spareservers }}
+StartServers {{ tinyproxy_start_servers }}
+MaxRequestsPerChild {{ tinyproxy_max_requests_per_child }}
+
+{% for ip in tinyproxy_allow %}
+Allow {{ ip }}
+{% endfor %}
+
+{% if tinyproxy_disable_via %}
+DisableViaHeader Yes
+{% else %}
+DisableViaHeader No
+ViaProxyName {{ tinyproxy_via_proxy_name }}
+{% endif %}
+
+{% for port in tinyproxy_connect_ports %}
+ConnectPort {{ port }}
+{% endfor %}
